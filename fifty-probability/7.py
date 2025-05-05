@@ -1,33 +1,46 @@
-# Chuck-a-Luck is a gambling game often played at carnivals and gambling houses. A player may bet on any one of the numbers 1, 2, 3, 4, 5, 6. Three dice are rolled. If the player’s number appears on one, two, three of the dice, he receives respectively one, two, or three times his original stake plus his own money back; otherwise he loses his stake.
-
-# Question: What is the player’s expected loss per unit stake?
+# 50 Challenging Problems in Probability
+# 7. Curing the Compulsive Gambler
+# Mr. Brown always bets a dollar on the number 13 at roulette against the advice of Kind Friend.
+# To help cure Mr Brown of playing roulette, Kind Friend always bets Brown $20 at even money
+# that Brown will be behind at the end of 36 plays. How is the cure working?
 
 import random
 
 
 # Simulation parameters
 T = 100000  # Number of trials
-# random.seed(69)  # Seed for reproducibility
+random.seed(69)  # Seed for reproducibility
 
-number = 13
+browns_number = 13
 total_rounds = 36
 
 
 def simulate():
-    players_choice = number
     roulette_roll = [random.randint(1, 38) for _ in range(total_rounds)]
-    return roulette_roll.count(players_choice)
+    return roulette_roll.count(browns_number)
 
 
 # Simulate
-W = 0
-for _ in range(T):
-    rounds_won = simulate()
-    gain = rounds_won * 36
-    loss = (total_rounds - rounds_won) * -1
-    net_gain = gain + loss
-    W += net_gain
-    # W += 1 if net_gain > 20 else 0
+brown_ahead = 0
+brown_behind = 0
+total_net_gain = 0
 
-# Gain/Loss Percentage
-print(W / T)
+for _ in range(T):
+    wins = simulate()
+    net_gain = wins * 35 - (total_rounds - wins)
+    total_net_gain += net_gain
+    if net_gain >= 0:
+        brown_ahead += 1
+    else:
+        brown_behind += 1
+
+# Final results
+expected_gain = total_net_gain / T
+fraction_ahead = brown_ahead / T
+fraction_behind = brown_behind / T
+kind_friend_expected_gain = 20 * (fraction_behind - fraction_ahead)
+
+print("Mr. Brown expected net gain per session:", expected_gain)
+print("Fraction of times Mr. Brown is ahead:   ", fraction_ahead)
+print("Fraction of times Mr. Brown is behind:  ", fraction_behind)
+print("Kind Friend's expected gain per bet:    ", kind_friend_expected_gain)
